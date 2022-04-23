@@ -3,9 +3,12 @@ package com.example.DemoGraphQL;
 import com.example.DemoGraphQL.exception.GraphQLErrorAdapter;
 import com.example.DemoGraphQL.model.Author;
 import com.example.DemoGraphQL.model.Book;
+import com.example.DemoGraphQL.model.Grade;
 import com.example.DemoGraphQL.repository.AuthorRepository;
 import com.example.DemoGraphQL.repository.BookRepository;
+import com.example.DemoGraphQL.repository.GradeRepository;
 import com.example.DemoGraphQL.resolver.BookResolver;
+import com.example.DemoGraphQL.resolver.GradeResolver;
 import com.example.DemoGraphQL.resolver.Mutation;
 import com.example.DemoGraphQL.resolver.Query;
 import graphql.ExceptionWhileDataFetching;
@@ -60,22 +63,33 @@ public class DemoGraphQlApplication extends SpringBootServletInitializer {
 	}
 
 	@Bean
-	public Query query(AuthorRepository authorRepository, BookRepository bookRepository) {
-		return new Query(authorRepository, bookRepository);
+	public GradeResolver gradeResolver(AuthorRepository authorRepository) {
+		return new GradeResolver(authorRepository);
 	}
 
 	@Bean
-	public Mutation mutation(AuthorRepository authorRepository, BookRepository bookRepository) {
-		return new Mutation(authorRepository, bookRepository);
+	public Query query(AuthorRepository authorRepository, BookRepository bookRepository, GradeRepository gradeRepository) {
+		return new Query(authorRepository, bookRepository, gradeRepository);
 	}
 
 	@Bean
-	public CommandLineRunner demo(AuthorRepository authorRepository, BookRepository bookRepository) {
+	public Mutation mutation(AuthorRepository authorRepository, BookRepository bookRepository, GradeRepository gradeRepository) {
+		return new Mutation(authorRepository, bookRepository, gradeRepository);
+	}
+
+	@Bean
+	public CommandLineRunner demo(AuthorRepository authorRepository, BookRepository bookRepository, GradeRepository gradeRepository) {
 		return (args) -> {
 			Author author = new Author("Herbert", "Schildt");
 			authorRepository.save(author);
 
 			bookRepository.save(new Book("Java: A Beginner's Guide, Sixth Edition", "0071809252", 728, author));
+
+			Grade grade = Grade.builder()
+					.author(author)
+					.code("Grade-V5").name("五年级").level(5)
+					.build();
+			gradeRepository.save(grade);
 		};
 	}
 }

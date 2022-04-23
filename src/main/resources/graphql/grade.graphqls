@@ -1,0 +1,18 @@
+type Grade {
+    id: ID!
+    name: String!
+    code: String!
+    level: Int
+    author: Author
+}
+
+extend type Query {
+    findAllGrades: [Grade]!
+    countGrades: Int!
+}
+
+extend type Mutation {
+    newGrade(name: String!, code: String!, level: Int, author: ID!) : Grade!
+    deleteGrade(id: ID!) : Boolean
+    updateGradeLevel(level: Int!, id: ID!) : Grade!
+}
